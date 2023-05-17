@@ -1,0 +1,29 @@
+name: mitarbeiter jacob portal
+on:
+  push:
+    branches:
+      - main
+      - feature-branch
+      
+jobs:
+  dev:
+    if: github.ref == 'refs/heads/feature-branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: dev
+        run: |
+          echo "${{secrets.MAXCCIDEV }}" | docker login -u "santosch" --password-stdin
+          docker image build -t santosch/maxccidev:v${{ github.run_number }} .
+          docker push santosch/maxccidev:v${{ github.run_number }}
+          
+  prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: prod
+        run: |
+         echo "${{secrets.MITARBEITERJACOBPORTALPROD }}" | docker login -u "santosch" --password-stdin
+         docker image build -t santosch/mitarbeiterjacobportalprod:v${{ github.run_number }} .
+         docker push santosch/mitarbeiterjacobportalprod:v${{ github.run_number }}
